@@ -1,6 +1,6 @@
 # hs client
 Client for HS demo project
-Server is [here](https://github.com/tempalych/hs-server)
+Server is [here](https://github.com/tempalych/hs-server).
 
 ## Usage
 Collect deps
@@ -25,5 +25,5 @@ docker build . -t hs-client
 
 Docker run image
 ```
-docker run -i -p 80:80 hs-client
+docker run --env-file /path/to/env -i -p 80:80 hs-client
 ```
