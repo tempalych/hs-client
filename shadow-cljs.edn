@@ -1,0 +1,26 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dependencies [[reagent "0.8.0"]]
+
+ :nrepl
+ {:port 3333}
+
+ :builds
+ {:app {:target :browser
+        :output-dir "public/js"
+        :asset-path "/js"
+        :closure-defines {hs.core/server-url 
+                          #shadow/env ["SERVER_URL" :default "http://localhost:8080"]}
+
+        :modules
+        {:main
+         {:entries [hs.core]}}
+
+        :devtools
+        {:after-load  hs.core/main
+         :http-root   "public"
+         :http-port   3000}}}}
