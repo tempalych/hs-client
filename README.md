@@ -1,5 +1,5 @@
 # hs client
-Client for HS demo project
+Client for HS demo project.
 Server is [here](https://github.com/tempalych/hs-server).
 
 ## Usage
