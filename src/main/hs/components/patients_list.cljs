@@ -168,9 +168,9 @@
               (if (not edit-mode)
                 "➕"
                 "✅")]]
-        [:td [:button {:id "btnCancel" 
+        [:td [:button {:id "btnCancel"
                        :on-click (fn [] (cancel))
-                       :disabled (not edit-mode)} 
+                       :disabled (not edit-mode)}
               "❌"]]])
      (let [invalid-lname (spec/validity-class :lname)
            invalid-fname (spec/validity-class :fname)
