@@ -53,15 +53,9 @@
         (.then (fn []
                  (swap! state update-in [:patients] dissoc (str id)))))))
 
-(defn enable-buttons [enable]
-  (doseq [patient (vals (:patients @state))]
-    (set! (.-disabled (.getElementById js/document (str "btnDel" (:id patient)))) enable)
-    (set! (.-disabled (.getElementById js/document (str "btnEdit" (:id patient)))) enable)))
-
 (defn edit-patient [id]
   (swap! state assoc :new (get (:patients @state) (str id)))
-  (swap! state assoc :editMode true)
-  (enable-buttons (:editMode @state)))
+  (swap! state assoc :edit-mode true))
 
 (defn apply-edit-patient [server-url]
   (let [url (str server-url "/patients")
@@ -87,15 +81,18 @@
         (.then (fn []
                  (swap! state assoc-in [:patients (str (:id (:new @state)))] (:new @state))
                  (swap! state assoc :new {})
-                 (swap! state assoc :editMode false)
-                 (enable-buttons (:editMode @state)))))))
+                 (swap! state assoc :edit-mode false))))))
 
 (defn add-or-apply [server-url]
   (if (empty? (:invalid @state))
-    (if (:editMode @state)
+    (if (:edit-mode @state)
       (apply-edit-patient server-url)
       (add-patient server-url))
     (js/alert "Check attributes validation")))
+
+(defn cancel []
+  (swap! state assoc :new {})
+  (swap! state assoc :edit-mode false))
 
 (defn patients-list [server-url]
   [:div
@@ -120,7 +117,8 @@
                           gender
                           birthdate
                           address
-                          insurance]} patient]
+                          insurance]} patient
+                  edit-mode (:edit-mode @state)]
               [:tr {:key id}
                [:td lname]
                [:td fname]
@@ -130,12 +128,15 @@
                [:td address]
                [:td insurance]
                [:td [:button {:id (str "btnEdit" id)
+                              :disabled edit-mode
                               :on-click (fn [] (edit-patient id))} "..."]]
                [:td [:button {:id (str "btnDel" id)
+                              :disabled edit-mode
                               :on-click (fn [] (delete-patient server-url id))} "🗑️"]]]))
           (vals (:patients @state)))]
     [:tfoot {:class "addoredit"}
-     (let [{:keys [lname fname pname gender birthdate address insurance]} (:new @state)]
+     (let [{:keys [lname fname pname gender birthdate address insurance]} (:new @state)
+           edit-mode (:edit-mode @state)]
        [:tr
         [:td [:input {:value lname :name "lname" :placeholder "Last Name"
                       :on-change (fn [e] (update-new-patient :lname (-> e .-target .-value)))}]]
@@ -164,10 +165,13 @@
         [:td [:input {:value insurance :name "insurance" :placeholder "Insurance Number"
                       :on-change (fn [e] (update-new-patient :insurance (-> e .-target .-value)))}]]
         [:td [:button {:id "btnAdd" :on-click (fn [] (add-or-apply server-url))}
-              (if (= (:editMode @state) false)
+              (if (not edit-mode)
                 "➕"
                 "✅")]]
-        [:td [:button {:id "btnCancel"} "❌"]]])
+        [:td [:button {:id "btnCancel"
+                       :on-click (fn [] (cancel))
+                       :disabled (not edit-mode)}
+              "❌"]]])
      (let [invalid-lname (spec/validity-class :lname)
            invalid-fname (spec/validity-class :fname)
            invalid-pname (spec/validity-class :pname)
@@ -185,8 +189,3 @@
         [:td [:div {:class (str "validator-" invalid-insurance)} "Max 100"]]
         [:td]
         [:td]])]]])
-
-
-(comment
-  
-  )
