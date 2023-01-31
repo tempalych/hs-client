@@ -20,10 +20,10 @@ $ npm run release
 
 Docker build image
 ```
-docker build . -t hs-client
+docker build . /path/to/env -t hs-client
 ```
 
 Docker run image
 ```
-docker run --env-file /path/to/env -i -p 80:80 hs-client
+docker run --env-file -i -p 80:80 hs-client
 ```
